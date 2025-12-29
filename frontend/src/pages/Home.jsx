@@ -3,7 +3,11 @@ import Hero from '../components/Hero';
 import PropertyCard from '../components/PropertyCard';
 import { propertyAPI, testAPI } from '../services/api';
 import { FiLoader, FiAlertCircle } from 'react-icons/fi';
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +21,7 @@ const Home = () => {
   const checkApiHealth = async () => {
     try {
       setApiStatus('checking');
-      const healthRes = await testAPI.health();
+      const healthRes = await testAPI.getServerStatus(); // ✅ FIXED: Changed from testAPI.health()
       console.log('API Health:', healthRes.data);
       setApiStatus('healthy');
       fetchFeaturedProperties();

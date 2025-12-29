@@ -30,7 +30,6 @@ const getAllProperties = async (req, res) => {
     if (bedrooms) where.bedrooms = parseInt(bedrooms);
     if (guests) where.max_guests = { [Op.gte]: parseInt(guests) };
     
-    // Handle verified_badge filter
     if (verified_badge !== undefined) {
       where.verified_badge = verified_badge === 'true' || verified_badge === true;
     }
@@ -99,16 +98,6 @@ const getPropertyById = async (req, res) => {
           model: User,
           as: 'host',
           attributes: ['id', 'name', 'phone', 'email', 'profile_image']
-        },
-        {
-          model: Review,
-          include: [
-            {
-              model: User,
-              attributes: ['id', 'name', 'profile_image']
-            }
-          ],
-          order: [['created_at', 'DESC']]
         }
       ]
     });
@@ -117,20 +106,34 @@ const getPropertyById = async (req, res) => {
       return res.status(404).json({ message: 'Property not found' });
     }
 
-    // Calculate average rating
+    // Fetch reviews separately
     const reviews = await Review.findAll({
+      where: { property_id: property.id },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'profile_image']
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    // Calculate average rating
+    const ratingStats = await Review.findAll({
       where: { property_id: property.id },
       attributes: [
         [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating']
       ]
     });
 
-    const averageRating = reviews[0]?.dataValues?.averageRating || 0;
+    const averageRating = ratingStats[0]?.dataValues?.averageRating || 0;
 
     res.json({
       success: true,
       property: {
         ...property.toJSON(),
+        reviews: reviews,
         averageRating: parseFloat(averageRating).toFixed(1)
       }
     });
@@ -140,9 +143,29 @@ const getPropertyById = async (req, res) => {
   }
 };
 
-// Create property
+// Create property - COMPREHENSIVE FIX
 const createProperty = async (req, res) => {
   try {
+    console.log('═══════════════════════════════════════');
+    console.log('📥 CREATE PROPERTY REQUEST');
+    console.log('═══════════════════════════════════════');
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+    console.log('Files:', req.files);
+    console.log('User:', req.user);
+    console.log('═══════════════════════════════════════');
+
+    // ✅ FIX 1: Check authentication FIRST
+    if (!req.user || !req.user.id) {
+      console.error('❌ Authentication failed - req.user:', req.user);
+      return res.status(401).json({ 
+        message: 'Authentication required. Please log in again.',
+        debug: {
+          hasUser: !!req.user,
+          userId: req.user?.id
+        }
+      });
+    }
+
     const {
       title,
       description,
@@ -157,32 +180,130 @@ const createProperty = async (req, res) => {
       longitude
     } = req.body;
 
-    const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    // ✅ FIX 2: Validate required fields with helpful messages
+    const missingFields = [];
+    if (!title) missingFields.push('title');
+    if (!description) missingFields.push('description');
+    if (!location) missingFields.push('location');
+    if (!address) missingFields.push('address');
+    if (!price_per_night) missingFields.push('price_per_night');
 
-    const property = await Property.create({
+    if (missingFields.length > 0) {
+      console.error('❌ Missing required fields:', missingFields);
+      return res.status(400).json({ 
+        message: 'Missing required fields',
+        missingFields,
+        received: Object.keys(req.body)
+      });
+    }
+
+    // ✅ FIX 3: Safely parse amenities (handle all formats)
+    let parsedAmenities = [];
+    if (amenities) {
+      try {
+        if (typeof amenities === 'string') {
+          // Handle JSON string
+          parsedAmenities = JSON.parse(amenities);
+        } else if (Array.isArray(amenities)) {
+          // Already an array
+          parsedAmenities = amenities;
+        } else {
+          // Single value
+          parsedAmenities = [String(amenities)];
+        }
+      } catch (e) {
+        console.warn('⚠️ Failed to parse amenities, using as single value:', e.message);
+        parsedAmenities = [String(amenities)];
+      }
+    }
+
+    // ✅ FIX 4: Handle images with correct path format
+    let images = [];
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      // Use filename only (no leading slash) since uploads are served statically
+      images = req.files.map(file => `uploads/${file.filename}`);
+      console.log('📸 Uploaded images:', images);
+    }
+
+    // ✅ FIX 5: Ensure all numeric fields have valid defaults
+    const propertyData = {
       host_id: req.user.id,
-      title,
-      description,
-      location,
-      address,
-      price_per_night,
-      bedrooms,
-      bathrooms,
-      max_guests,
-      amenities: amenities ? JSON.parse(amenities) : [],
-      images,
-      latitude,
-      longitude,
+      title: String(title).trim(),
+      description: String(description).trim(),
+      location: String(location).trim(),
+      address: String(address).trim(),
+      price_per_night: parseFloat(price_per_night),
+      bedrooms: bedrooms ? parseInt(bedrooms) : 1,
+      bathrooms: bathrooms ? parseInt(bathrooms) : 1,
+      max_guests: max_guests ? parseInt(max_guests) : 2,
+      amenities: parsedAmenities, // Setter will convert to JSON string
+      images: images,              // Setter will convert to JSON string
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
       status: req.user.role === 'admin' ? 'approved' : 'pending'
-    });
+    };
 
+    console.log('📝 Creating property with data:', JSON.stringify(propertyData, null, 2));
+
+    // ✅ FIX 6: Create with try-catch for Sequelize validation errors
+    const property = await Property.create(propertyData);
+
+    console.log('✅ Property created successfully:', property.id);
+
+    // Return property with parsed JSON fields (getters handle this)
     res.status(201).json({
       success: true,
-      property
+      message: 'Property created successfully',
+      property: property.toJSON()
     });
+
   } catch (error) {
-    console.error('Error in createProperty:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('═══════════════════════════════════════');
+    console.error('❌ ERROR IN createProperty');
+    console.error('═══════════════════════════════════════');
+    console.error('Error Type:', error.name);
+    console.error('Error Message:', error.message);
+    
+    // ✅ FIX 7: Handle Sequelize validation errors specifically
+    if (error.name === 'SequelizeValidationError') {
+      console.error('Validation Errors:', error.errors.map(e => ({
+        field: e.path,
+        message: e.message,
+        value: e.value
+      })));
+      
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: error.errors.map(e => ({
+          field: e.path,
+          message: e.message
+        }))
+      });
+    }
+
+    // ✅ FIX 8: Handle database constraint errors
+    if (error.name === 'SequelizeDatabaseError') {
+      console.error('Database Error:', error.message);
+      return res.status(400).json({
+        message: 'Database error',
+        error: error.message
+      });
+    }
+
+    // Generic error
+    console.error('Stack:', error.stack);
+    console.error('═══════════════════════════════════════');
+    
+    res.status(500).json({ 
+      message: 'Failed to create property',
+      error: error.message,
+      debug: {
+        errorType: error.name,
+        hasUser: !!req.user,
+        hasFiles: !!req.files,
+        bodyKeys: Object.keys(req.body)
+      }
+    });
   }
 };
 
@@ -197,29 +318,56 @@ const updateProperty = async (req, res) => {
 
     // Check ownership or admin access
     if (property.host_id !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized' });
+      return res.status(403).json({ message: 'Not authorized to update this property' });
     }
 
-    const updates = req.body;
+    const updates = { ...req.body };
+
+    // Parse amenities safely if provided
     if (updates.amenities) {
-      updates.amenities = JSON.parse(updates.amenities);
+      try {
+        if (typeof updates.amenities === 'string') {
+          updates.amenities = JSON.parse(updates.amenities);
+        } else if (!Array.isArray(updates.amenities)) {
+          updates.amenities = [updates.amenities];
+        }
+      } catch (e) {
+        console.warn('Failed to parse amenities in update:', e.message);
+        updates.amenities = [String(updates.amenities)];
+      }
     }
 
-    // Handle new images
+    // Handle new images (append to existing)
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => `/uploads/${file.filename}`);
-      updates.images = [...property.images, ...newImages];
+      const newImages = req.files.map(file => `uploads/${file.filename}`);
+      const existingImages = property.images || [];
+      updates.images = [...existingImages, ...newImages];
     }
 
     await property.update(updates);
 
     res.json({
       success: true,
-      property
+      message: 'Property updated successfully',
+      property: property.toJSON()
     });
   } catch (error) {
     console.error('Error in updateProperty:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: error.errors.map(e => ({
+          field: e.path,
+          message: e.message
+        }))
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Failed to update property',
+      error: error.message 
+    });
   }
 };
 
@@ -234,7 +382,7 @@ const deleteProperty = async (req, res) => {
 
     // Check ownership or admin access
     if (property.host_id !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized' });
+      return res.status(403).json({ message: 'Not authorized to delete this property' });
     }
 
     await property.destroy();
@@ -245,36 +393,47 @@ const deleteProperty = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in deleteProperty:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ 
+      message: 'Failed to delete property',
+      error: error.message 
+    });
   }
 };
 
 // Get my properties
 const getMyProperties = async (req, res) => {
   try {
+    console.log('📋 Fetching properties for user:', req.user.id);
+    
     const properties = await Property.findAll({
       where: { host_id: req.user.id },
       include: [
         {
           model: User,
           as: 'host',
-          attributes: ['id', 'name']
+          attributes: ['id', 'name', 'profile_image']
         }
       ],
       order: [['created_at', 'DESC']]
     });
 
+    console.log(`✅ Found ${properties.length} properties`);
+
     res.json({
       success: true,
-      properties
+      count: properties.length,
+      properties: properties.map(p => p.toJSON())
     });
   } catch (error) {
     console.error('Error in getMyProperties:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ 
+      message: 'Failed to fetch properties',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
-// Export all functions
 module.exports = {
   getAllProperties,
   getPropertyById,

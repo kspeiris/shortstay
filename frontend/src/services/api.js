@@ -80,7 +80,8 @@ export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
   login: (credentials) => api.post('/auth/login', credentials),
   logout: () => api.post('/auth/logout'),
-  getCurrentUser: () => api.get('/auth/me'),
+  getProfile: () => api.get('/auth/profile'),
+  getCurrentUser: () => api.get('/auth/profile'), // Alias
   updateProfile: (userData) => api.put('/auth/profile', userData),
   changePassword: (passwordData) => api.put('/auth/change-password', passwordData),
 };
@@ -102,6 +103,7 @@ export const propertyAPI = {
 export const bookingAPI = {
   create: (bookingData) => api.post('/bookings', bookingData),
   getMyBookings: () => api.get('/bookings/my-bookings'),
+  getHostBookings: () => api.get('/bookings/host-bookings'), // ✅ ADDED - matches backend route
   getById: (id) => api.get(`/bookings/${id}`),
   cancel: (id) => api.put(`/bookings/${id}/cancel`),
   updateStatus: (id, status) => api.put(`/bookings/${id}/status`, { status }),
@@ -115,9 +117,6 @@ export const reviewAPI = {
   update: (id, reviewData) => api.put(`/reviews/${id}`, reviewData),
   delete: (id) => api.delete(`/reviews/${id}`),
 };
-
-// Admin API
-// Replace the Admin API section in your existing api.js file with this:
 
 // Admin API - Updated to match backend routes
 export const adminAPI = {

@@ -52,6 +52,7 @@ const getPropertyReviews = async (req, res) => {
       include: [
         {
           model: User,
+          as: 'user',  // ✅ ADD THIS - must match the alias in models/index.js
           attributes: ['id', 'name', 'profile_image']
         }
       ],
@@ -67,7 +68,6 @@ const getPropertyReviews = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 const updateReview = async (req, res) => {
   try {
     const review = await Review.findByPk(req.params.id);

@@ -4,7 +4,7 @@ import { propertyAPI, bookingAPI } from '../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../utils/format';
 import { 
   FiHome, FiCalendar, FiDollarSign, FiPlus, 
-  FiEdit, FiTrash2, FiCheck, FiX 
+  FiEdit, FiTrash2, FiCheck, FiX, FiAlertCircle 
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 
@@ -13,6 +13,7 @@ const HostDashboard = () => {
   const [properties, setProperties] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('properties');
 
   useEffect(() => {
@@ -21,13 +22,52 @@ const HostDashboard = () => {
 
   const fetchHostData = async () => {
     try {
-      const [propertiesRes, bookingsRes] = await Promise.all([
-        propertyAPI.getMyProperties(),
-        bookingAPI.getHostBookings(),
-      ]);
-      setProperties(propertiesRes.data.properties);
-      setBookings(bookingsRes.data.bookings);
+      setLoading(true);
+      setError(null);
+
+      console.log('🔄 Fetching host data...');
+
+      // ✅ FIX: Fetch properties with proper error handling
+      let propertiesData = [];
+      try {
+        const propertiesRes = await propertyAPI.getMyProperties();
+        console.log('✅ Properties response:', propertiesRes.data);
+        propertiesData = propertiesRes.data.properties || [];
+      } catch (propError) {
+        console.error('❌ Properties fetch error:', propError);
+        // Don't throw - just use empty array
+        propertiesData = [];
+        if (propError.response?.status === 404) {
+          console.log('ℹ️ No properties found (404) - treating as empty list');
+        } else {
+          toast.error('Failed to load properties');
+        }
+      }
+
+      // ✅ FIX: Fetch bookings with proper error handling
+      let bookingsData = [];
+      try {
+        const bookingsRes = await bookingAPI.getHostBookings();
+        console.log('✅ Bookings response:', bookingsRes.data);
+        bookingsData = bookingsRes.data.bookings || [];
+      } catch (bookError) {
+        console.error('❌ Bookings fetch error:', bookError);
+        // Don't throw - just use empty array
+        bookingsData = [];
+        if (bookError.response?.status === 404) {
+          console.log('ℹ️ No bookings found (404) - treating as empty list');
+        } else if (bookError.response?.status !== 404) {
+          // Only show error toast if it's not a 404
+          toast.error('Failed to load bookings');
+        }
+      }
+
+      setProperties(propertiesData);
+      setBookings(bookingsData);
+
     } catch (error) {
+      console.error('❌ Fatal error in fetchHostData:', error);
+      setError('Failed to load dashboard data. Please try again.');
       toast.error('Failed to load host data');
     } finally {
       setLoading(false);
@@ -41,7 +81,8 @@ const HostDashboard = () => {
         setProperties(properties.filter(p => p.id !== propertyId));
         toast.success('Property deleted successfully');
       } catch (error) {
-        toast.error('Failed to delete property');
+        console.error('Delete error:', error);
+        toast.error(error.response?.data?.message || 'Failed to delete property');
       }
     }
   };
@@ -54,7 +95,8 @@ const HostDashboard = () => {
       ));
       toast.success(`Booking ${status} successfully`);
     } catch (error) {
-      toast.error('Failed to update booking status');
+      console.error('Update booking status error:', error);
+      toast.error(error.response?.data?.message || 'Failed to update booking status');
     }
   };
 
@@ -67,7 +109,37 @@ const HostDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="loading-spinner"></div>
+        <div className="text-center">
+          <div className="loading-spinner mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Show error state if there was a fatal error
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="max-w-2xl mx-auto mt-12">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="flex items-start">
+              <FiAlertCircle className="text-red-600 w-6 h-6 mr-3 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-red-800 mb-2">
+                  Error Loading Dashboard
+                </h3>
+                <p className="text-red-700 mb-4">{error}</p>
+                <button
+                  onClick={fetchHostData}
+                  className="btn-primary"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -34,15 +34,30 @@ const BookingModal = ({ property, isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      await bookingAPI.create({
+      // Calculate total price
+      const totalPrice = calculateTotal();
+      
+      // Prepare payload with all required fields
+      const payload = {
         property_id: property.id,
-        ...bookingData,
         start_date: bookingData.start_date.toISOString().split('T')[0],
         end_date: bookingData.end_date.toISOString().split('T')[0],
-      });
+        guests: bookingData.guests,
+        total_price: totalPrice, // ✅ Include calculated total_price
+      };
+
+      // Only add special_requests if it has a value
+      if (bookingData.special_requests?.trim()) {
+        payload.special_requests = bookingData.special_requests;
+      }
+
+      console.log('📤 Sending booking payload:', payload);
+
+      await bookingAPI.create(payload);
       toast.success('Booking request sent successfully!');
       onClose();
     } catch (error) {
+      console.error('❌ Booking error:', error.response?.data);
       toast.error(error.response?.data?.message || 'Failed to create booking');
     } finally {
       setLoading(false);

@@ -38,45 +38,7 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    let mounted = true;
-
-    const fetchAdminData = async () => {
-      try {
-        const [
-          statsRes,
-          usersRes,
-          pendingRes,
-          paymentsRes
-        ] = await Promise.all([
-          adminAPI.getDashboardStats(),
-          adminAPI.getUsers(),
-          adminAPI.getPendingProperties(),
-          adminAPI.getPayments(),
-        ]);
-
-        if (mounted) {
-          setStats(statsRes.data || {});
-          setUsers(usersRes.data?.users || []);
-          setPendingProperties(pendingRes.data?.properties || []);
-          setPayments(paymentsRes.data?.payments || []);
-        }
-      } catch (error) {
-        console.error('Failed to load admin data:', error);
-        if (mounted) {
-          toast.error('Failed to load admin data');
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
     fetchAdminData();
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const fetchAdminData = async () => {
@@ -94,13 +56,23 @@ const Admin = () => {
         adminAPI.getPayments(),
       ]);
 
+      console.log('📊 Admin data received:', {
+        stats: statsRes.data,
+        users: usersRes.data,
+        properties: pendingRes.data,
+        payments: paymentsRes.data
+      });
+
       setStats(statsRes.data || {});
       setUsers(usersRes.data?.users || []);
       setPendingProperties(pendingRes.data?.properties || []);
       setPayments(paymentsRes.data?.payments || []);
-      toast.success('Data refreshed successfully');
+      
+      if (activeTab === 'overview') {
+        toast.success('Data loaded successfully');
+      }
     } catch (error) {
-      console.error('Failed to load admin data:', error);
+      console.error('❌ Failed to load admin data:', error);
       toast.error('Failed to load admin data');
     } finally {
       setLoading(false);
@@ -112,7 +84,6 @@ const Admin = () => {
       await adminAPI.updatePropertyStatus(propertyId, { status: 'approved' });
       setPendingProperties(pendingProperties.filter(p => p.id !== propertyId));
       toast.success('Property approved successfully');
-      // Refresh stats to update counts
       fetchAdminData();
     } catch (error) {
       console.error('Failed to approve property:', error);
@@ -125,7 +96,6 @@ const Admin = () => {
       await adminAPI.updatePropertyStatus(propertyId, { status: 'rejected' });
       setPendingProperties(pendingProperties.filter(p => p.id !== propertyId));
       toast.success('Property rejected successfully');
-      // Refresh stats to update counts
       fetchAdminData();
     } catch (error) {
       console.error('Failed to reject property:', error);
@@ -165,7 +135,7 @@ const Admin = () => {
     switch (status.toLowerCase()) {
       case 'approved':
       case 'completed':
-      case 'success':
+      case 'confirmed':
         return 'success';
       case 'pending':
         return 'warning';
@@ -288,46 +258,19 @@ const Admin = () => {
       <div className="mb-6">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'overview'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('users')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'users'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Users
-            </button>
-            <button
-              onClick={() => setActiveTab('properties')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'properties'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Properties
-            </button>
-            <button
-              onClick={() => setActiveTab('payments')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'payments'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Payments
-            </button>
+            {['overview', 'users', 'properties', 'payments'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
+                  activeTab === tab
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </nav>
         </div>
       </div>
@@ -430,8 +373,9 @@ const Admin = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div>{property.User?.name || 'Unknown'}</div>
-                          <div className="text-sm text-gray-500">{property.User?.email || 'N/A'}</div>
+                          {/* ✅ Fixed: Use lowercase 'host' */}
+                          <div>{property.host?.name || 'Unknown'}</div>
+                          <div className="text-sm text-gray-500">{property.host?.email || 'N/A'}</div>
                         </td>
                         <td className="px-6 py-4 font-medium">
                           {formatCurrency(property.price_per_night || 0)}/night
@@ -491,10 +435,12 @@ const Admin = () => {
                     {stats.recentBookings.map((booking) => (
                       <tr key={booking.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
-                          <div className="font-medium">{booking.Guest?.name || 'Unknown'}</div>
+                          {/* ✅ Fixed: Use lowercase 'guest' */}
+                          <div className="font-medium">{booking.guest?.name || 'Unknown'}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-medium">{booking.Property?.title || 'Unknown'}</div>
+                          {/* ✅ Fixed: Use lowercase 'property' */}
+                          <div className="font-medium">{booking.property?.title || 'Unknown'}</div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-sm">
@@ -582,6 +528,8 @@ const Admin = () => {
                           <option value="guest">Guest</option>
                           <option value="host">Host</option>
                           <option value="admin">Admin</option>
+                          <option value="payment_manager">Payment Manager</option>
+                          <option value="field_inspector">Field Inspector</option>
                         </select>
                       </td>
                       <td className="px-6 py-4">
@@ -629,7 +577,7 @@ const Admin = () => {
       {activeTab === 'properties' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold">All Properties</h3>
+            <h3 className="text-lg font-bold">Pending Properties ({pendingProperties.length})</h3>
             <button
               onClick={fetchAdminData}
               className="flex items-center text-sm text-primary-600 hover:text-primary-700"
@@ -639,13 +587,13 @@ const Admin = () => {
             </button>
           </div>
           
-          {[...pendingProperties, ...(stats?.properties || [])].length === 0 ? (
+          {pendingProperties.length === 0 ? (
             <div className="card p-8 text-center">
-              <p className="text-gray-600">No properties found</p>
+              <p className="text-gray-600">No pending properties</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...pendingProperties, ...(stats?.properties || [])].map((property) => (
+              {pendingProperties.map((property) => (
                 <div key={property.id} className="card">
                   <img
                     src={property.images?.[0] || 'https://via.placeholder.com/400x200'}
@@ -663,19 +611,26 @@ const Admin = () => {
                       </span>
                     </div>
                     <p className="text-gray-600 text-sm mb-3">{property.location || 'No location'}</p>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-3">
                       <div className="font-bold text-primary-600">
                         {formatCurrency(property.price_per_night || 0)}/night
                       </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => window.open(`/properties/${property.id}`, '_blank')}
-                          className="text-primary-600 hover:text-primary-700 p-1"
-                          title="View"
-                        >
-                          <FiEye className="w-4 h-4" />
-                        </button>
-                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleApproveProperty(property.id)}
+                        className="flex-1 btn-primary px-3 py-2 text-sm"
+                      >
+                        <FiCheck className="inline mr-1" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleRejectProperty(property.id)}
+                        className="flex-1 btn-danger px-3 py-2 text-sm"
+                      >
+                        <FiX className="inline mr-1" />
+                        Reject
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -728,10 +683,12 @@ const Admin = () => {
                         <div className="font-mono text-sm">{payment.transaction_id || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div>{payment.Booking?.Guest?.name || 'Unknown'}</div>
+                        {/* ✅ Fixed: Use lowercase 'booking' and 'guest' */}
+                        <div>{payment.booking?.guest?.name || 'Unknown'}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div>{payment.Booking?.Property?.title || 'Unknown'}</div>
+                        {/* ✅ Fixed: Use lowercase 'booking' and 'property' */}
+                        <div>{payment.booking?.property?.title || 'Unknown'}</div>
                       </td>
                       <td className="px-6 py-4 font-medium">
                         {formatCurrency(payment.amount || 0)}
@@ -754,6 +711,18 @@ const Admin = () => {
           )}
         </div>
       )}
+
+      {/* Add a refresh button at the bottom */}
+      <div className="mt-8 flex justify-end">
+        <button
+          onClick={fetchAdminData}
+          disabled={loading}
+          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FiRefreshCw className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
+          {loading ? 'Refreshing...' : 'Refresh All Data'}
+        </button>
+      </div>
     </div>
   );
 };
