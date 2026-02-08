@@ -195,18 +195,18 @@ const Admin = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container min-h-screen transition-colors duration-300">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-gray-600">Manage the ShortStay platform</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400">Manage the ShortStay platform</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="card p-6">
+        <div className="card p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Total Users</p>
+              <p className="text-gray-600 dark:text-gray-400">Total Users</p>
               <p className="text-3xl font-bold">{stats?.stats?.totalUsers || 0}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
@@ -215,10 +215,10 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Properties</p>
+              <p className="text-gray-600 dark:text-gray-400">Properties</p>
               <p className="text-3xl font-bold">{stats?.stats?.totalProperties || 0}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
@@ -227,10 +227,10 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Total Bookings</p>
+              <p className="text-gray-600 dark:text-gray-400">Total Bookings</p>
               <p className="text-3xl font-bold">{stats?.stats?.totalBookings || 0}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full">
@@ -239,10 +239,10 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Total Revenue</p>
+              <p className="text-gray-600 dark:text-gray-400">Total Revenue</p>
               <p className="text-3xl font-bold">
                 {formatCurrency(stats?.stats?.totalRevenue || 0)}
               </p>
@@ -256,7 +256,7 @@ const Admin = () => {
 
       {/* Tabs */}
       <div className="mb-6">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-gray-800">
           <nav className="-mb-px flex space-x-8">
             {['overview', 'users', 'properties', 'payments'].map((tab) => (
               <button
@@ -280,8 +280,8 @@ const Admin = () => {
         <div className="space-y-8">
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="card p-6">
-              <h3 className="text-lg font-bold mb-4">Monthly Revenue</h3>
+            <div className="card p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Monthly Revenue</h3>
               <div className="h-64">
                 {stats?.monthlyRevenue && stats.monthlyRevenue.length > 0 ? (
                   <Bar 
@@ -292,15 +292,15 @@ const Admin = () => {
                     }}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
                     No revenue data available
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="card p-6">
-              <h3 className="text-lg font-bold mb-4">User Distribution</h3>
+            <div className="card p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">User Distribution</h3>
               <div className="h-64">
                 {users.length > 0 ? (
                   <Pie 
@@ -311,7 +311,7 @@ const Admin = () => {
                     }}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
                     No user data available
                   </div>
                 )}
@@ -323,7 +323,7 @@ const Admin = () => {
           <div className="card">
             <div className="p-6 border-b">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold">Pending Properties</h3>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Pending Properties</h3>
                 <span className="badge badge-warning">
                   {pendingProperties.length} pending
                 </span>
@@ -332,12 +332,12 @@ const Admin = () => {
             
             {pendingProperties.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-600">No pending properties</p>
+                <p className="text-gray-600 dark:text-gray-400">No pending properties</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 dark:bg-gray-800/50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Property
@@ -353,9 +353,9 @@ const Admin = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                     {pendingProperties.map((property) => (
-                      <tr key={property.id} className="hover:bg-gray-50">
+                      <tr key={property.id} className="hover:bg-gray-50 dark:bg-gray-800/50">
                         <td className="px-6 py-4">
                           <div className="flex items-center">
                             <img
@@ -368,14 +368,14 @@ const Admin = () => {
                             />
                             <div>
                               <div className="font-medium">{property.title || 'Untitled'}</div>
-                              <div className="text-sm text-gray-500">{property.location || 'No location'}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{property.location || 'No location'}</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           {/* ✅ Fixed: Use lowercase 'host' */}
                           <div>{property.host?.name || 'Unknown'}</div>
-                          <div className="text-sm text-gray-500">{property.host?.email || 'N/A'}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{property.host?.email || 'N/A'}</div>
                         </td>
                         <td className="px-6 py-4 font-medium">
                           {formatCurrency(property.price_per_night || 0)}/night
@@ -415,7 +415,7 @@ const Admin = () => {
             {stats?.recentBookings && stats.recentBookings.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 dark:bg-gray-800/50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Guest
@@ -431,9 +431,9 @@ const Admin = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                     {stats.recentBookings.map((booking) => (
-                      <tr key={booking.id} className="hover:bg-gray-50">
+                      <tr key={booking.id} className="hover:bg-gray-50 dark:bg-gray-800/50">
                         <td className="px-6 py-4">
                           {/* ✅ Fixed: Use lowercase 'guest' */}
                           <div className="font-medium">{booking.guest?.name || 'Unknown'}</div>
@@ -457,7 +457,7 @@ const Admin = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-600">No recent bookings</p>
+                <p className="text-gray-600 dark:text-gray-400">No recent bookings</p>
               </div>
             )}
           </div>
@@ -470,18 +470,18 @@ const Admin = () => {
           <div className="p-6 border-b">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold">All Users</h3>
-              <span className="text-gray-600">{users.length} users</span>
+              <span className="text-gray-600 dark:text-gray-400">{users.length} users</span>
             </div>
           </div>
           
           {users.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600">No users found</p>
+              <p className="text-gray-600 dark:text-gray-400">No users found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       User
@@ -500,9 +500,9 @@ const Admin = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                   {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user.id} className="hover:bg-gray-50 dark:bg-gray-800/50">
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <img
@@ -515,7 +515,7 @@ const Admin = () => {
                           />
                           <div>
                             <div className="font-medium">{user.name || 'Unknown'}</div>
-                            <div className="text-sm text-gray-500">{user.email || 'N/A'}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{user.email || 'N/A'}</div>
                           </div>
                         </div>
                       </td>
@@ -550,7 +550,7 @@ const Admin = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           {formatDate(user.created_at)}
                         </div>
                       </td>
@@ -589,7 +589,7 @@ const Admin = () => {
           
           {pendingProperties.length === 0 ? (
             <div className="card p-8 text-center">
-              <p className="text-gray-600">No pending properties</p>
+              <p className="text-gray-600 dark:text-gray-400">No pending properties</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -649,12 +649,12 @@ const Admin = () => {
           
           {payments.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600">No payment transactions found</p>
+              <p className="text-gray-600 dark:text-gray-400">No payment transactions found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Transaction
@@ -676,9 +676,9 @@ const Admin = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                   {payments.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-gray-50">
+                    <tr key={payment.id} className="hover:bg-gray-50 dark:bg-gray-800/50">
                       <td className="px-6 py-4">
                         <div className="font-mono text-sm">{payment.transaction_id || 'N/A'}</div>
                       </td>
@@ -699,7 +699,7 @@ const Admin = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           {formatDate(payment.payment_date)}
                         </div>
                       </td>

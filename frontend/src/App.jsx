@@ -16,12 +16,13 @@ import CreateProperty from './pages/CreateProperty';
 import Dashboard from './pages/Dashboard';
 import HostDashboard from './pages/HostDashboard';
 import Admin from './pages/Admin';
+import HowItWorks from './pages/HowItWorks';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
           <Navbar />
           <main className="flex-grow">
             <Routes>
@@ -31,38 +32,39 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/properties/:id" element={<PropertyDetails />} />
-              
+              <Route path="/how-it-works" element={<HowItWorks />} />
+
               {/* Protected Routes */}
               <Route path="/dashboard" element={
                 <PrivateRoute>
                   <Dashboard />
                 </PrivateRoute>
               } />
-              
+
               <Route path="/host" element={
                 <PrivateRoute allowedRoles={['host', 'admin']}>
                   <HostDashboard />
                 </PrivateRoute>
               } />
-              
+
               <Route path="/properties/add" element={
                 <PrivateRoute allowedRoles={['host', 'admin']}>
                   <CreateProperty />
                 </PrivateRoute>
               } />
-              
+
               <Route path="/properties/:id/edit" element={
                 <PrivateRoute allowedRoles={['host', 'admin']}>
                   <CreateProperty />
                 </PrivateRoute>
               } />
-              
+
               <Route path="/admin" element={
                 <PrivateRoute allowedRoles={['admin']}>
                   <Admin />
                 </PrivateRoute>
               } />
-              
+
               {/* Catch all route */}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

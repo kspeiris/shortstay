@@ -27,24 +27,24 @@ const Hero = () => {
   return (
     <div className="relative bg-gradient-to-r from-primary-500 to-primary-700 text-white">
       <div className="absolute inset-0 bg-black opacity-20"></div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 animate-fade-in">
             Find Your Perfect Short Stay
           </h1>
           <p className="text-xl opacity-90 max-w-2xl mx-auto">
-            Discover unique accommodations from local hosts across Sri Lanka. 
+            Discover unique accommodations from local hosts across Sri Lanka.
             Book your stay with confidence and experience authentic hospitality.
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-2xl p-6">
+          <form onSubmit={handleSearch} className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 border border-transparent dark:border-gray-800 transition-colors duration-300">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Location */}
               <div className="space-y-2">
-                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <FiMapPin />
                   <span>Location</span>
                 </label>
@@ -53,19 +53,19 @@ const Hero = () => {
                   placeholder="Where do you want to stay?"
                   className="input-field"
                   value={searchParams.location}
-                  onChange={(e) => setSearchParams({...searchParams, location: e.target.value})}
+                  onChange={(e) => setSearchParams({ ...searchParams, location: e.target.value })}
                 />
               </div>
 
               {/* Check-in */}
               <div className="space-y-2">
-                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <FiCalendar />
                   <span>Check-in</span>
                 </label>
                 <DatePicker
                   selected={searchParams.startDate}
-                  onChange={(date) => setSearchParams({...searchParams, startDate: date})}
+                  onChange={(date) => setSearchParams({ ...searchParams, startDate: date })}
                   minDate={new Date()}
                   placeholderText="Select date"
                   className="input-field"
@@ -75,13 +75,13 @@ const Hero = () => {
 
               {/* Check-out */}
               <div className="space-y-2">
-                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <FiCalendar />
                   <span>Check-out</span>
                 </label>
                 <DatePicker
                   selected={searchParams.endDate}
-                  onChange={(date) => setSearchParams({...searchParams, endDate: date})}
+                  onChange={(date) => setSearchParams({ ...searchParams, endDate: date })}
                   minDate={searchParams.startDate || new Date()}
                   placeholderText="Select date"
                   className="input-field"
@@ -91,15 +91,15 @@ const Hero = () => {
 
               {/* Guests */}
               <div className="space-y-2">
-                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <FiUsers />
                   <span>Guests</span>
                 </label>
-                <div className="flex items-center border border-gray-300 rounded-lg">
+                <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 transition-colors">
                   <button
                     type="button"
-                    onClick={() => setSearchParams({...searchParams, guests: Math.max(1, searchParams.guests - 1)})}
-                    className="px-3 py-2 text-gray-600 hover:text-primary-600"
+                    onClick={() => setSearchParams({ ...searchParams, guests: Math.max(1, searchParams.guests - 1) })}
+                    className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                   >
                     -
                   </button>
@@ -108,13 +108,13 @@ const Hero = () => {
                     min="1"
                     max="20"
                     value={searchParams.guests}
-                    onChange={(e) => setSearchParams({...searchParams, guests: parseInt(e.target.value) || 1})}
-                    className="w-full px-2 py-2 text-center border-0 focus:ring-0"
+                    onChange={(e) => setSearchParams({ ...searchParams, guests: parseInt(e.target.value) || 1 })}
+                    className="w-full px-2 py-2 text-center border-0 focus:ring-0 bg-transparent text-gray-900 dark:text-white"
                   />
                   <button
                     type="button"
-                    onClick={() => setSearchParams({...searchParams, guests: Math.min(20, searchParams.guests + 1)})}
-                    className="px-3 py-2 text-gray-600 hover:text-primary-600"
+                    onClick={() => setSearchParams({ ...searchParams, guests: Math.min(20, searchParams.guests + 1) })}
+                    className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                   >
                     +
                   </button>

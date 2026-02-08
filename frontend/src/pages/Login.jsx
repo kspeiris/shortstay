@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       await login(formData.email, formData.password);
       navigate('/dashboard');
@@ -27,23 +27,23 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white dark:from-gray-950 dark:to-gray-900 flex items-center justify-center py-12 px-4 transition-colors duration-300">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center space-x-2 mb-8">
             <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
               <FiHome className="text-white w-6 h-6" />
             </div>
-            <span className="text-2xl font-bold text-primary-600">ShortStay</span>
+            <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">ShortStay</span>
           </Link>
-          <h2 className="text-3xl font-bold">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card p-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email Address
               </label>
               <div className="relative">
@@ -54,7 +54,7 @@ const Login = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input-field pl-10"
                   placeholder="you@example.com"
                 />
@@ -62,7 +62,7 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -73,7 +73,7 @@ const Login = () => {
                   type="password"
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="input-field pl-10"
                   placeholder="••••••••"
                 />
@@ -88,11 +88,11 @@ const Login = () => {
                 id="remember"
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="remember" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                 Remember me
               </label>
             </div>
-            <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-500">
+            <Link to="/forgot-password" disabled className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500">
               Forgot password?
             </Link>
           </div>
@@ -110,9 +110,9 @@ const Login = () => {
           </button>
 
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+              <Link to="/register" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
                 Sign up
               </Link>
             </p>
@@ -120,13 +120,13 @@ const Login = () => {
         </form>
 
         <div className="text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             By signing in, you agree to our{' '}
-            <Link to="/terms" className="text-primary-600 hover:text-primary-500">
+            <Link to="/terms" className="text-primary-600 dark:text-primary-400 hover:text-primary-500">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-primary-600 hover:text-primary-500">
+            <Link to="/privacy" className="text-primary-600 dark:text-primary-400 hover:text-primary-500">
               Privacy Policy
             </Link>
           </p>

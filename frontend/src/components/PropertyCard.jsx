@@ -8,7 +8,7 @@ const PropertyCard = ({ property }) => {
   const imageUrl = property.images?.[0] || 'https://via.placeholder.com/400x300';
 
   return (
-    <div className="card overflow-hidden hover:shadow-xl transition-all duration-300 group">
+    <div className="card overflow-hidden hover:shadow-xl transition-all duration-300 group dark:bg-gray-900 dark:border-gray-800">
       <div className="relative h-48 overflow-hidden">
         <img
           src={imageUrl}
@@ -16,35 +16,35 @@ const PropertyCard = ({ property }) => {
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
         {property.verified_badge && (
-          <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+          <div className="absolute top-2 left-2 badge badge-success">
             Verified
           </div>
         )}
-        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg">
-          <span className="font-bold text-primary-600">{formatCurrency(property.price_per_night)}</span>
-          <span className="text-xs text-gray-600">/night</span>
+        <div className="absolute top-2 right-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-2 py-1 rounded-lg">
+          <span className="font-bold text-primary-600 dark:text-primary-400">{formatCurrency(property.price_per_night)}</span>
+          <span className="text-xs text-gray-600 dark:text-gray-400">/night</span>
         </div>
       </div>
 
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-bold text-lg truncate">{property.title}</h3>
+          <h3 className="font-bold text-lg truncate dark:text-white">{property.title}</h3>
           <div className="flex items-center space-x-1">
             <FiStar className="text-yellow-400 fill-current" />
-            <span className="font-medium">{averageRating}</span>
+            <span className="font-medium dark:text-gray-100">{averageRating}</span>
           </div>
         </div>
 
-        <div className="flex items-center text-gray-600 mb-3">
+        <div className="flex items-center text-gray-600 dark:text-gray-400 mb-3">
           <FiMapPin className="mr-1" />
           <span className="truncate">{property.location}</span>
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
           {property.description}
         </p>
 
-        <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
+        <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <FiHome className="mr-1" />
@@ -64,7 +64,7 @@ const PropertyCard = ({ property }) => {
               alt={property.User?.name}
               className="w-8 h-8 rounded-full mr-2"
             />
-            <span className="text-sm font-medium">{property.User?.name}</span>
+            <span className="text-sm font-medium dark:text-gray-200">{property.User?.name}</span>
           </div>
           <Link
             to={`/properties/${property.id}`}

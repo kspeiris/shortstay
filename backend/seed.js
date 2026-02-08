@@ -1,5 +1,4 @@
 require('dotenv').config();
-const bcrypt = require('bcryptjs');
 const { sequelize, User, Property, Booking, Review, Payment } = require('./models');
 
 const seedDatabase = async () => {
@@ -9,11 +8,11 @@ const seedDatabase = async () => {
     console.log('✅ Database synced!');
 
     // Create admin user - password: admin123
-    const adminPassword = await bcrypt.hash('admin123', 10);
+    // NO manual hashing - let the model hooks handle it
     const admin = await User.create({
       name: 'Admin User',
       email: 'admin@shortstay.com',
-      password: adminPassword,
+      password: 'admin123',
       role: 'admin',
       verified: true,
       phone: '+94 77 123 4567',
@@ -22,11 +21,10 @@ const seedDatabase = async () => {
     });
 
     // Create host user - password: host123
-    const hostPassword = await bcrypt.hash('host123', 10);
     const host = await User.create({
       name: 'John Host',
       email: 'host@example.com',
-      password: hostPassword,
+      password: 'host123',
       role: 'host',
       verified: true,
       phone: '+94 76 987 6543',
@@ -35,11 +33,10 @@ const seedDatabase = async () => {
     });
 
     // Create guest user - password: guest123
-    const guestPassword = await bcrypt.hash('guest123', 10);
     const guest = await User.create({
       name: 'Sarah Guest',
       email: 'guest@example.com',
-      password: guestPassword,
+      password: 'guest123',
       role: 'guest',
       verified: true,
       phone: '+94 71 456 7890',
@@ -207,7 +204,7 @@ const seedDatabase = async () => {
     console.log('   Admin: admin@shortstay.com / admin123');
     console.log('   Host:  host@example.com / host123');
     console.log('   Guest: guest@example.com / guest123');
-    console.log('\n🔑 Passwords are properly hashed and will work with login.');
+    console.log('\n🔑 Passwords are properly hashed by model hooks and will work with login.');
     
     process.exit(0);
   } catch (error) {

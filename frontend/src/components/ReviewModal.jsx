@@ -39,12 +39,12 @@ const ReviewModal = ({ propertyId, bookingId, isOpen, onClose, onReviewSubmitted
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
+        <div className="fixed inset-0 bg-black opacity-50 dark:opacity-70 dark:opacity-70" onClick={onClose}></div>
         
-        <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full animate-slide-up">
+        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full animate-slide-up border border-transparent dark:border-gray-800 transition-colors">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">Write a Review</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Write a Review</h3>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full"
