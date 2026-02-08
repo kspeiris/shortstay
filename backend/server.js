@@ -9,6 +9,8 @@ const propertyRoutes = require('./routes/properties');
 const bookingRoutes = require('./routes/bookings');
 const reviewRoutes = require('./routes/reviews');
 const adminRoutes = require('./routes/admin');
+const managerRoutes = require('./routes/manager');
+
 
 const app = express();
 
@@ -34,11 +36,13 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/manager', managerRoutes);
+
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     timestamp: new Date(),
     service: 'ShortStay API'
   });
@@ -49,36 +53,36 @@ app.get('/api/test', async (req, res) => {
   try {
     const { Property } = require('./models');
     const count = await Property.count();
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'API is working',
-      propertyCount: count 
+      propertyCount: count
     });
   } catch (error) {
     console.error('Test endpoint error:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Database error',
-      error: error.message 
+      error: error.message
     });
   }
 });
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: 'API endpoint not found' 
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found'
   });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('🚨 Server Error:', err.stack);
-  
+
   const statusCode = err.status || 500;
   const message = err.message || 'Something went wrong!';
-  
+
   res.status(statusCode).json({
     success: false,
     message,
@@ -97,7 +101,7 @@ const startServer = async () => {
   try {
     // Sync database
     await syncDatabase();
-    
+
     // Start server
     app.listen(PORT, () => {
       console.log(`

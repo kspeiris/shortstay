@@ -84,6 +84,10 @@ const Property = sequelize.define('Property', {
     type: DataTypes.DECIMAL(11, 8),
     allowNull: true
   },
+  inspector_notes: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

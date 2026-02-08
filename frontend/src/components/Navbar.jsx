@@ -16,6 +16,7 @@ import {
   FiBookmark,
   FiSettings,
   FiCalendar,
+  FiDollarSign,
   FiShield
 } from 'react-icons/fi';
 import { TbBuilding } from 'react-icons/tb';
@@ -109,6 +110,25 @@ const Navbar = () => {
       active: location.pathname.startsWith('/admin')
     });
   }
+
+  if (user?.role === 'payment_manager') {
+    navLinks.push({
+      name: 'Payments',
+      path: '/payment-manager',
+      icon: <FiDollarSign className="w-4 h-4" />,
+      active: location.pathname.startsWith('/payment-manager')
+    });
+  }
+
+  if (user?.role === 'field_inspector') {
+    navLinks.push({
+      name: 'Inspections',
+      path: '/inspector',
+      icon: <FiSearch className="w-4 h-4" />,
+      active: location.pathname.startsWith('/inspector')
+    });
+  }
+
 
   const userMenuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <FiHome className="w-4 h-4" /> },

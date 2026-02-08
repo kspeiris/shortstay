@@ -21,8 +21,8 @@
 - **👤 Guest**: Explore properties, view maps, read reviews, and book stays with ease.
 - **🏠 Host**: List properties, manage bookings, track earnings, and respond to guest inquiries.
 - **🛠️ Admin**: Oversee the entire ecosystem, approve/reject property listings, and manage user roles.
-- **💳 Payment Manager**: Specialized role for overseeing financial transactions and revenue.
-- **🔍 Field Inspector**: Verifies property authenticity through physical or virtual inspections.
+- **💳 Payment Manager**: Specialized role for overseeing financial transactions and revenue via a dedicated dashboard.
+- **🔍 Field Inspector**: Verifies property authenticity through inspections and manages the "Verified" badge for listings.
 
 ---
 

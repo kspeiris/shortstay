@@ -17,6 +17,9 @@ import Dashboard from './pages/Dashboard';
 import HostDashboard from './pages/HostDashboard';
 import Admin from './pages/Admin';
 import HowItWorks from './pages/HowItWorks';
+import PaymentDashboard from './pages/PaymentDashboard';
+import InspectorDashboard from './pages/InspectorDashboard';
+
 
 function App() {
   return (
@@ -64,6 +67,19 @@ function App() {
                   <Admin />
                 </PrivateRoute>
               } />
+
+              <Route path="/payment-manager" element={
+                <PrivateRoute allowedRoles={['payment_manager', 'admin']}>
+                  <PaymentDashboard />
+                </PrivateRoute>
+              } />
+
+              <Route path="/inspector" element={
+                <PrivateRoute allowedRoles={['field_inspector', 'admin']}>
+                  <InspectorDashboard />
+                </PrivateRoute>
+              } />
+
 
               {/* Catch all route */}
               <Route path="*" element={<Navigate to="/" />} />

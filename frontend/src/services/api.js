@@ -15,7 +15,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log(`📤 API Request [${config.method?.toUpperCase()}] ${config.url}`);
@@ -23,7 +23,7 @@ api.interceptors.request.use(
     } else {
       console.log(`📤 API Request [${config.method?.toUpperCase()}] ${config.url} - No token`);
     }
-    
+
     return config;
   },
   (error) => {
@@ -45,12 +45,12 @@ api.interceptors.response.use(
       message: error.response?.data?.message || error.message,
       data: error.response?.data
     });
-    
+
     if (error.response?.status === 401) {
       console.log('🔒 Unauthorized - Clearing local storage');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      
+
       // Only show toast if not already on login page
       if (!window.location.pathname.includes('/login')) {
         toast.error('Session expired. Please login again.');
@@ -70,7 +70,7 @@ api.interceptors.response.use(
     } else if (!error.response) {
       toast.error('Network error. Please check your connection.');
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -122,27 +122,38 @@ export const reviewAPI = {
 export const adminAPI = {
   // Dashboard Stats
   getDashboardStats: () => api.get('/admin/dashboard/stats'),
-  
+
   // Users Management
   getUsers: () => api.get('/admin/users'),
   getAllUsers: () => api.get('/admin/users'), // Alias for compatibility
   updateUser: (userId, userData) => api.put(`/admin/users/${userId}`, userData),
   updateUserRole: (userId, role) => api.put(`/admin/users/${userId}`, { role }),
   deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
-  
+
   // Properties Management
   getPendingProperties: () => api.get('/admin/properties/pending'),
   getAllProperties: () => api.get('/admin/properties'),
   updatePropertyStatus: (propertyId, statusData) => api.put(`/admin/properties/${propertyId}/status`, statusData),
   deleteProperty: (propertyId) => api.delete(`/admin/properties/${propertyId}`),
-  
+
   // Payments Management
   getPayments: () => api.get('/admin/payments'),
   getAllPayments: () => api.get('/admin/payments'), // Alias for compatibility
-  
+
   // Bookings Management (if needed)
   getAllBookings: () => api.get('/admin/bookings'),
   updateBookingStatus: (bookingId, status) => api.put(`/admin/bookings/${bookingId}/status`, { status }),
+};
+
+// Manager API (Payment Manager & Field Inspector)
+export const managerAPI = {
+  // Payments (Payment Manager)
+  getPayments: () => api.get('/manager/payments'),
+  updatePaymentStatus: (id, status) => api.put(`/manager/payments/${id}`, { status }),
+
+  // Inspections (Field Inspector)
+  getInspections: () => api.get('/manager/inspections'),
+  verifyProperty: (id, data) => api.put(`/manager/properties/${id}/verify`, data),
 };
 
 // Test API
