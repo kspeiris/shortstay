@@ -42,7 +42,7 @@ const updateUserRole = async (req, res) => {
 
     await user.save();
 
-    console.log(`✅ Updated user ${user.id}: role=${user.role}, verified=${user.verified}`);
+    console.log(`✅ [ADMIN] Updated user ${user.id}: role=${user.role}, verified=${user.verified} by admin ${req.user.id}`);
 
     res.json({
       success: true,
@@ -168,7 +168,7 @@ const updatePropertyStatus = async (req, res) => {
 
     await property.save();
 
-    console.log(`✅ Updated property ${property.id}: status=${property.status}`);
+    console.log(`✅ [ADMIN] Updated property ${property.id}: status=${property.status} by admin ${req.user.id}`);
 
     res.json({
       success: true,

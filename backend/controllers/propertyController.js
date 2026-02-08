@@ -16,20 +16,20 @@ const getAllProperties = async (req, res) => {
     } = req.query;
 
     const where = { status: 'approved' };
-    
+
     if (location) {
       where.location = { [Op.like]: `%${location}%` };
     }
-    
+
     if (minPrice || maxPrice) {
       where.price_per_night = {};
       if (minPrice) where.price_per_night[Op.gte] = parseFloat(minPrice);
       if (maxPrice) where.price_per_night[Op.lte] = parseFloat(maxPrice);
     }
-    
+
     if (bedrooms) where.bedrooms = parseInt(bedrooms);
     if (guests) where.max_guests = { [Op.gte]: parseInt(guests) };
-    
+
     if (verified_badge !== undefined) {
       where.verified_badge = verified_badge === 'true' || verified_badge === true;
     }
@@ -81,8 +81,8 @@ const getAllProperties = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in getAllProperties:', error);
-    res.status(500).json({ 
-      message: 'Server error', 
+    res.status(500).json({
+      message: 'Server error',
       error: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
@@ -157,7 +157,7 @@ const createProperty = async (req, res) => {
     // ✅ FIX 1: Check authentication FIRST
     if (!req.user || !req.user.id) {
       console.error('❌ Authentication failed - req.user:', req.user);
-      return res.status(401).json({ 
+      return res.status(401).json({
         message: 'Authentication required. Please log in again.',
         debug: {
           hasUser: !!req.user,
@@ -190,7 +190,7 @@ const createProperty = async (req, res) => {
 
     if (missingFields.length > 0) {
       console.error('❌ Missing required fields:', missingFields);
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'Missing required fields',
         missingFields,
         received: Object.keys(req.body)
@@ -263,7 +263,7 @@ const createProperty = async (req, res) => {
     console.error('═══════════════════════════════════════');
     console.error('Error Type:', error.name);
     console.error('Error Message:', error.message);
-    
+
     // ✅ FIX 7: Handle Sequelize validation errors specifically
     if (error.name === 'SequelizeValidationError') {
       console.error('Validation Errors:', error.errors.map(e => ({
@@ -271,7 +271,7 @@ const createProperty = async (req, res) => {
         message: e.message,
         value: e.value
       })));
-      
+
       return res.status(400).json({
         message: 'Validation error',
         errors: error.errors.map(e => ({
@@ -293,8 +293,8 @@ const createProperty = async (req, res) => {
     // Generic error
     console.error('Stack:', error.stack);
     console.error('═══════════════════════════════════════');
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       message: 'Failed to create property',
       error: error.message,
       debug: {
@@ -322,6 +322,15 @@ const updateProperty = async (req, res) => {
     }
 
     const updates = { ...req.body };
+
+    // ✅ FIX: Force status to 'pending' if host updates sensitive fields (requires re-approval)
+    const sensitiveFields = ['title', 'description', 'price_per_night', 'location', 'address', 'bedrooms', 'bathrooms', 'max_guests'];
+    const updatedSensitiveFields = sensitiveFields.filter(field => updates[field] !== undefined && String(updates[field]) !== String(property[field]));
+
+    if (req.user.role !== 'admin' && updatedSensitiveFields.length > 0) {
+      console.log(`🔄 Property updates detected in sensitive fields: ${updatedSensitiveFields.join(', ')}. Status reverted to pending.`);
+      updates.status = 'pending';
+    }
 
     // Parse amenities safely if provided
     if (updates.amenities) {
@@ -353,7 +362,7 @@ const updateProperty = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in updateProperty:', error);
-    
+
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
         message: 'Validation error',
@@ -363,10 +372,10 @@ const updateProperty = async (req, res) => {
         }))
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       message: 'Failed to update property',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -393,9 +402,9 @@ const deleteProperty = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in deleteProperty:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to delete property',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -404,7 +413,7 @@ const deleteProperty = async (req, res) => {
 const getMyProperties = async (req, res) => {
   try {
     console.log('📋 Fetching properties for user:', req.user.id);
-    
+
     const properties = await Property.findAll({
       where: { host_id: req.user.id },
       include: [
@@ -426,7 +435,7 @@ const getMyProperties = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in getMyProperties:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to fetch properties',
       error: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined

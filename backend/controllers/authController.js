@@ -19,23 +19,27 @@ const register = async (req, res) => {
 
   try {
     console.log('📝 Registration attempt for:', email);
-    
+
     const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Restrict roles that can be self-assigned during registration
+    const allowedRoles = ['guest', 'host'];
+    const finalRole = (role && allowedRoles.includes(role)) ? role : 'guest';
+
     const user = await User.create({
       name,
       email,
       password,
-      role: role || 'guest',
+      role: finalRole,
       phone,
-      verified: role === 'guest' ? true : false
+      verified: finalRole === 'guest' ? true : false
     });
 
     console.log('✅ User created:', user.email);
-    
+
     const token = generateToken(user.id);
     console.log('🔑 Token generated for user:', user.id);
 
@@ -58,29 +62,29 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  
+
   console.log('🔐 Login attempt for:', email);
 
   try {
     const user = await User.findOne({ where: { email } });
-    
+
     if (!user) {
       console.log('❌ User not found:', email);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    
+
     console.log('✅ User found:', user.email);
-    
+
     const isMatch = await user.comparePassword(password);
     console.log('🔑 Password match result:', isMatch);
-    
+
     if (!isMatch) {
       console.log('❌ Password mismatch for:', email);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    
+
     console.log('✅ Login successful for:', user.email);
-    
+
     const token = generateToken(user.id);
     console.log('🔑 Token generated:', token.substring(0, 50) + '...');
 
@@ -108,11 +112,11 @@ const getProfile = async (req, res) => {
     const user = await User.findByPk(req.user.id, {
       attributes: { exclude: ['password'] }
     });
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     res.json(user);
   } catch (error) {
     console.error('❌ Profile error:', error);

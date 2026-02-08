@@ -10,7 +10,7 @@ const createBooking = async (req, res) => {
 
     // Validate required fields
     if (!property_id || !start_date || !end_date || !total_price) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'Missing required fields',
         required: ['property_id', 'start_date', 'end_date', 'total_price']
       });
@@ -20,6 +20,43 @@ const createBooking = async (req, res) => {
     const property = await Property.findByPk(property_id);
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
+    }
+
+    // Prevent self-booking
+    if (property.host_id === req.user.id) {
+      return res.status(400).json({ message: 'You cannot book your own property' });
+    }
+
+    // Validate dates are not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(start_date) < today) {
+      return res.status(400).json({ message: 'Check-in date cannot be in the past' });
+    }
+
+    // Validate guest count
+    if (guests && guests > property.max_guests) {
+      return res.status(400).json({
+        message: `This property only allows up to ${property.max_guests} guests`
+      });
+    }
+
+    // Verify total price (recalculate on backend)
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+    if (nights <= 0) {
+      return res.status(400).json({ message: 'End date must be after start date' });
+    }
+
+    const calculatedPrice = property.price_per_night * nights;
+
+    // Allow a small margin for rounding or if total_price is missing, use calculated
+    if (total_price && Math.abs(parseFloat(total_price) - calculatedPrice) > 1) {
+      console.warn(`⚠️ Price mismatch: Received ${total_price}, Calculated ${calculatedPrice}`);
+      // Security: Force backend calculated price or reject
+      // return res.status(400).json({ message: 'Price calculation mismatch' });
     }
 
     // Check for conflicting bookings
@@ -54,8 +91,8 @@ const createBooking = async (req, res) => {
       property_id,
       start_date,
       end_date,
-      guests: guests || property.max_guests,
-      total_price,
+      guests: guests || 1,
+      total_price: calculatedPrice, // Always use backend-calculated price
       status: 'pending'
     });
 
@@ -67,9 +104,9 @@ const createBooking = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error in createBooking:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to create booking',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -81,19 +118,26 @@ const getMyBookings = async (req, res) => {
   console.log('========================================');
   console.log('📋 GET MY BOOKINGS CALLED');
   console.log('========================================');
-  
+
   try {
     console.log('Step 1: Checking user');
     if (!req.user) {
       console.error('❌ No user in request');
       return res.status(401).json({ message: 'Not authenticated' });
     }
-    
+
     console.log('Step 2: User ID:', req.user.id);
     console.log('Step 3: Starting database query...');
 
     const bookings = await Booking.findAll({
       where: { guest_id: req.user.id },
+      include: [
+        {
+          model: Property,
+          as: 'property',
+          attributes: ['id', 'title', 'location', 'images']
+        }
+      ],
       order: [['created_at', 'DESC']]
     });
 
@@ -112,8 +156,8 @@ const getMyBookings = async (req, res) => {
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     console.error('========================================');
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       message: 'Failed to fetch bookings',
       error: error.message,
       details: error.stack
@@ -238,9 +282,9 @@ const getById = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error in getById:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to fetch booking',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -269,8 +313,8 @@ const cancelBooking = async (req, res) => {
 
     // Check if booking can be cancelled
     if (booking.status === 'completed' || booking.status === 'cancelled') {
-      return res.status(400).json({ 
-        message: `Cannot cancel a ${booking.status} booking` 
+      return res.status(400).json({
+        message: `Cannot cancel a ${booking.status} booking`
       });
     }
 
@@ -284,9 +328,9 @@ const cancelBooking = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error in cancelBooking:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to cancel booking',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -300,9 +344,9 @@ const updateStatus = async (req, res) => {
     const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
 
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'Invalid status',
-        validStatuses 
+        validStatuses
       });
     }
 
@@ -319,8 +363,8 @@ const updateStatus = async (req, res) => {
       booking.property.host_id !== req.user.id &&
       req.user.role !== 'admin'
     ) {
-      return res.status(403).json({ 
-        message: 'Not authorized to update this booking' 
+      return res.status(403).json({
+        message: 'Not authorized to update this booking'
       });
     }
 
@@ -334,9 +378,9 @@ const updateStatus = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error in updateStatus:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to update booking status',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -350,7 +394,7 @@ const getPropertyBookings = async (req, res) => {
 
     // Check if property exists and user has access
     const property = await Property.findByPk(propertyId);
-    
+
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
     }
@@ -359,8 +403,8 @@ const getPropertyBookings = async (req, res) => {
       property.host_id !== req.user.id &&
       req.user.role !== 'admin'
     ) {
-      return res.status(403).json({ 
-        message: 'Not authorized to view bookings for this property' 
+      return res.status(403).json({
+        message: 'Not authorized to view bookings for this property'
       });
     }
 
@@ -390,9 +434,9 @@ const getPropertyBookings = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error in getPropertyBookings:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to fetch property bookings',
-      error: error.message 
+      error: error.message
     });
   }
 };
