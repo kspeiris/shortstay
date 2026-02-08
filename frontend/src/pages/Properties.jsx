@@ -111,7 +111,7 @@ const Properties = () => {
           max_guests: 8,
           property_type: 'villa',
           images: ['https://images.unsplash.com/photo-1613977257363-707ba9348227'],
-          User: { name: 'John Silva', profile_image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e' },
+          host: { name: 'John Silva', profile_image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e' },
           verified_badge: true,
           averageRating: 4.8,
           amenities: ['Pool', 'WiFi', 'AC', 'Kitchen', 'Parking']
@@ -127,7 +127,7 @@ const Properties = () => {
           max_guests: 4,
           property_type: 'apartment',
           images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00'],
-          User: { name: 'Sarah Perera', profile_image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786' },
+          host: { name: 'Sarah Perera', profile_image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786' },
           verified_badge: true,
           averageRating: 4.6,
           amenities: ['WiFi', 'AC', 'Gym', 'Concierge']

@@ -2,15 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { propertyAPI, bookingAPI } from '../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../utils/format';
-import { 
-  FiHome, 
-  FiCalendar, 
-  FiDollarSign, 
-  FiPlus, 
-  FiEdit, 
-  FiTrash2, 
-  FiCheck, 
-  FiX, 
+import {
+  FiHome,
+  FiCalendar,
+  FiDollarSign,
+  FiPlus,
+  FiEdit,
+  FiTrash2,
+  FiCheck,
+  FiX,
   FiAlertCircle,
   FiUsers,
   FiStar,
@@ -122,11 +122,11 @@ const HostDashboard = () => {
   const handleUpdateBookingStatus = async (bookingId, status) => {
     try {
       await bookingAPI.updateStatus(bookingId, status);
-      setBookings(bookings.map(b => 
+      setBookings(bookings.map(b =>
         b.id === bookingId ? { ...b, status } : b
       ));
       toast.success(`Booking ${status} successfully`);
-      
+
       // Update stats
       if (status === 'confirmed') {
         setStats(prev => ({
@@ -215,7 +215,7 @@ const HostDashboard = () => {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Host Dashboard</h1>
               <p className="text-blue-200">Manage your properties, bookings, and earnings</p>
             </div>
-            
+
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => navigate('/properties/add')}
@@ -302,11 +302,10 @@ const HostDashboard = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 px-6 py-4 font-medium text-center transition-all whitespace-nowrap ${
-                  activeTab === tab
+                className={`flex-1 px-6 py-4 font-medium text-center transition-all whitespace-nowrap ${activeTab === tab
                     ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-500'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                  }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -336,7 +335,7 @@ const HostDashboard = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="month" />
                       <YAxis />
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value) => [`${formatCurrency(value)}`, 'Revenue']}
                         labelStyle={{ color: '#374151' }}
                       />
@@ -353,11 +352,10 @@ const HostDashboard = () => {
                   <div className="space-y-4">
                     {recentActivities.map((activity) => (
                       <div key={activity.id} className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                        <div className={`p-2 rounded-lg ${
-                          activity.type === 'booking' ? 'bg-blue-100' :
-                          activity.type === 'review' ? 'bg-yellow-100' :
-                          'bg-green-100'
-                        }`}>
+                        <div className={`p-2 rounded-lg ${activity.type === 'booking' ? 'bg-blue-100' :
+                            activity.type === 'review' ? 'bg-yellow-100' :
+                              'bg-green-100'
+                          }`}>
                           {activity.type === 'booking' && <FiCalendar className="w-4 h-4 text-blue-600" />}
                           {activity.type === 'review' && <FiStar className="w-4 h-4 text-yellow-600" />}
                           {activity.type === 'payment' && <FiCreditCard className="w-4 h-4 text-green-600" />}
@@ -430,7 +428,7 @@ const HostDashboard = () => {
                   </div>
                 </div>
               </div>
-              
+
               {properties.length === 0 ? (
                 <div className="text-center py-16 px-4">
                   <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -458,17 +456,16 @@ const HostDashboard = () => {
                           alt={property.title}
                           className="w-full lg:w-48 h-40 rounded-xl object-cover"
                         />
-                        
+
                         <div className="flex-1">
                           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                             <div>
                               <div className="flex items-center gap-3 mb-2">
                                 <h4 className="text-lg font-bold text-gray-900 dark:text-white">{property.title}</h4>
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                  property.status === 'active' ? 'bg-green-100 text-green-800' :
-                                  property.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-red-100 text-red-800'
-                                }`}>
+                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${property.status === 'active' ? 'bg-green-100 text-green-800' :
+                                    property.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-red-100 text-red-800'
+                                  }`}>
                                   {property.status}
                                 </span>
                               </div>
@@ -488,7 +485,7 @@ const HostDashboard = () => {
                               </div>
                               <p className="text-gray-600 dark:text-gray-400">{property.location}</p>
                             </div>
-                            
+
                             <div className="text-right">
                               <div className="text-2xl font-bold text-blue-600">
                                 {formatCurrency(property.price_per_night)}
@@ -500,7 +497,7 @@ const HostDashboard = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="flex flex-wrap gap-3 mt-6">
                             <button
                               onClick={() => navigate(`/properties/${property.id}`)}
@@ -553,7 +550,7 @@ const HostDashboard = () => {
                   </div>
                 </div>
               </div>
-              
+
               {bookings.length === 0 ? (
                 <div className="text-center py-16 px-4">
                   <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -574,20 +571,19 @@ const HostDashboard = () => {
                             <div>
                               <div className="flex items-center gap-3 mb-2">
                                 <h4 className="text-lg font-bold text-gray-900 dark:text-white">
-                                  {booking.Guest?.name || 'Guest'}
+                                  {booking.guest?.name || 'Guest'}
                                 </h4>
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                  getStatusColor(booking.status) === 'green' ? 'bg-green-100 text-green-800' :
-                                  getStatusColor(booking.status) === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                                  getStatusColor(booking.status) === 'red' ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
+                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status) === 'green' ? 'bg-green-100 text-green-800' :
+                                    getStatusColor(booking.status) === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+                                      getStatusColor(booking.status) === 'red' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'
+                                  }`}>
                                   {booking.status}
                                 </span>
                               </div>
-                              <p className="text-gray-600 dark:text-gray-400">{booking.Property?.title}</p>
+                              <p className="text-gray-600 dark:text-gray-400">{booking.property?.title}</p>
                             </div>
-                            
+
                             <div className="text-right">
                               <div className="text-xl font-bold text-gray-900 dark:text-white">
                                 {formatCurrency(booking.total_price)}
@@ -597,7 +593,7 @@ const HostDashboard = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="p-3 bg-gray-50 rounded-lg">
                               <div className="text-sm text-gray-600 mb-1">Check-in</div>
@@ -608,7 +604,7 @@ const HostDashboard = () => {
                               <div className="font-medium">{formatDate(booking.end_date)}</div>
                             </div>
                           </div>
-                          
+
                           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                             <div className="flex items-center gap-2">
                               <FiUsers className="w-4 h-4" />
@@ -626,7 +622,7 @@ const HostDashboard = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         {booking.status === 'pending' && (
                           <div className="flex flex-col gap-3">
                             <button
@@ -672,7 +668,7 @@ const HostDashboard = () => {
                   Download Report
                 </button>
               </div>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6">
                   <div className="text-sm mb-2">Total Earnings</div>
@@ -690,7 +686,7 @@ const HostDashboard = () => {
                   <div className="text-sm opacity-90">Processing in 3 days</div>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-gray-50 rounded-xl">
                 <h4 className="font-bold text-gray-900 mb-4">Recent Transactions</h4>
                 {bookings.filter(b => b.status === 'confirmed' || b.status === 'completed').length > 0 ? (
@@ -702,7 +698,7 @@ const HostDashboard = () => {
                         <div key={booking.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                           <div>
                             <div className="font-medium text-gray-900 dark:text-white">Booking #{booking.id}</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">{booking.Property?.title}</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">{booking.property?.title}</div>
                           </div>
                           <div className="text-right">
                             <div className="font-bold text-green-600">{formatCurrency(booking.total_price)}</div>

@@ -590,12 +590,12 @@ const PropertyDetails = () => {
                 <h4 className="font-bold text-gray-900 dark:text-white mb-6">Meet your host</h4>
                 <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl transition-colors">
                   <img
-                    src={property.User?.profile_image || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
-                    alt={property.User?.name}
+                    src={property.host?.profile_image || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
+                    alt={property.host?.name}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div className="flex-1">
-                    <div className="font-bold text-gray-900 dark:text-white">{property.User?.name}</div>
+                    <div className="font-bold text-gray-900 dark:text-white">{property.host?.name}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Superhost • Joined 2022</div>
                     <div className="flex items-center gap-3 text-sm">
                       <div className="flex items-center gap-1">

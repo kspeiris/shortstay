@@ -60,11 +60,11 @@ const PropertyCard = ({ property }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <img
-              src={property.User?.profile_image || 'https://via.placeholder.com/32'}
-              alt={property.User?.name}
+              src={property.host?.profile_image || 'https://via.placeholder.com/32'}
+              alt={property.host?.name}
               className="w-8 h-8 rounded-full mr-2"
             />
-            <span className="text-sm font-medium dark:text-gray-200">{property.User?.name}</span>
+            <span className="text-sm font-medium dark:text-gray-200">{property.host?.name}</span>
           </div>
           <Link
             to={`/properties/${property.id}`}

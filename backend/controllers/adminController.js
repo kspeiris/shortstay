@@ -1,9 +1,10 @@
 const { User, Property, Booking, Payment, Review, sequelize } = require('../models');
+const { Op } = require('sequelize');
 
 const getAllUsers = async (req, res) => {
   try {
     console.log('📋 Fetching all users...');
-    
+
     const users = await User.findAll({
       attributes: { exclude: ['password'] },
       order: [['created_at', 'DESC']]
@@ -89,7 +90,7 @@ const deleteUser = async (req, res) => {
 const getAllProperties = async (req, res) => {
   try {
     console.log('📋 Fetching all properties...');
-    
+
     const properties = await Property.findAll({
       include: [
         {
@@ -116,7 +117,7 @@ const getAllProperties = async (req, res) => {
 const getPendingProperties = async (req, res) => {
   try {
     console.log('📋 Fetching pending properties...');
-    
+
     const properties = await Property.findAll({
       where: { status: 'pending' },
       include: [
@@ -204,7 +205,7 @@ const deleteProperty = async (req, res) => {
 const getDashboardStats = async (req, res) => {
   try {
     console.log('📊 Fetching dashboard stats...');
-    
+
     // Basic counts with error handling
     const [
       totalUsers,
@@ -266,10 +267,10 @@ const getDashboardStats = async (req, res) => {
 
       const payments = await Payment.findAll({
         attributes: ['amount', 'payment_date'],
-        where: { 
+        where: {
           status: 'completed',
           payment_date: {
-            [sequelize.Op.gte]: sixMonthsAgo
+            [Op.gte]: sixMonthsAgo
           }
         },
         raw: true
@@ -316,8 +317,8 @@ const getDashboardStats = async (req, res) => {
   } catch (error) {
     console.error('❌ Error in getDashboardStats:', error);
     console.error('Stack trace:', error.stack);
-    res.status(500).json({ 
-      message: 'Server error', 
+    res.status(500).json({
+      message: 'Server error',
       error: error.message,
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
@@ -327,7 +328,7 @@ const getDashboardStats = async (req, res) => {
 const getAllBookings = async (req, res) => {
   try {
     console.log('📋 Fetching all bookings...');
-    
+
     const bookings = await Booking.findAll({
       include: [
         {
@@ -389,7 +390,7 @@ const updateBookingStatus = async (req, res) => {
 const getAllPayments = async (req, res) => {
   try {
     console.log('📋 Fetching all payments...');
-    
+
     // First, try with full includes
     let payments;
     try {
@@ -420,7 +421,7 @@ const getAllPayments = async (req, res) => {
       console.log(`✅ Found ${payments.length} payments with full details`);
     } catch (includeError) {
       console.error('❌ Error with includes, trying simple query:', includeError);
-      
+
       // Fallback: Get payments without includes
       payments = await Payment.findAll({
         order: [['payment_date', 'DESC']]
@@ -437,8 +438,8 @@ const getAllPayments = async (req, res) => {
     console.error('Error name:', error.name);
     console.error('Error message:', error.message);
     console.error('Stack trace:', error.stack);
-    res.status(500).json({ 
-      message: 'Server error', 
+    res.status(500).json({
+      message: 'Server error',
       error: error.message,
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });

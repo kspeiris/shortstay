@@ -324,10 +324,10 @@ const Dashboard = () => {
                   <div key={booking.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <div className="font-bold text-gray-900 dark:text-white">{booking.Property?.title}</div>
+                        <div className="font-bold text-gray-900 dark:text-white">{booking.property?.title}</div>
                         <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                           <FiMapPin className="w-3 h-3" />
-                          {booking.Property?.location}
+                          {booking.property?.location}
                         </div>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${booking.status === 'confirmed' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
@@ -441,8 +441,8 @@ const Dashboard = () => {
                 <div key={booking.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                   <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                     <img
-                      src={booking.Property?.images?.[0] || 'https://images.unsplash.com/photo-1613977257363-707ba9348227'}
-                      alt={booking.Property?.title}
+                      src={booking.property?.images?.[0] || 'https://images.unsplash.com/photo-1613977257363-707ba9348227'}
+                      alt={booking.property?.title}
                       className="w-full lg:w-48 h-40 rounded-xl object-cover"
                     />
 
@@ -450,7 +450,7 @@ const Dashboard = () => {
                       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
-                            <h4 className="text-lg font-bold text-gray-900 dark:text-white">{booking.Property?.title}</h4>
+                            <h4 className="text-lg font-bold text-gray-900 dark:text-white">{booking.property?.title}</h4>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${getStatusColor(booking.status) === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
                               getStatusColor(booking.status) === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
                                 getStatusColor(booking.status) === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
@@ -473,7 +473,7 @@ const Dashboard = () => {
 
                           <p className="text-gray-600 dark:text-gray-400">
                             <FiMapPin className="inline w-4 h-4 mr-1" />
-                            {booking.Property?.location}
+                            {booking.property?.location}
                           </p>
                         </div>
 
@@ -484,14 +484,14 @@ const Dashboard = () => {
                           <div className="text-sm text-gray-600 dark:text-gray-400">Total amount</div>
                           <div className="flex items-center justify-end gap-1 mt-2">
                             <FiStar className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="font-medium">{booking.Property?.averageRating || '4.5'}</span>
+                            <span className="font-medium">{booking.property?.averageRating || '4.5'}</span>
                           </div>
                         </div>
                       </div>
 
                       <div className="flex flex-wrap gap-3 mt-6">
                         <button
-                          onClick={() => navigate(`/properties/${booking.Property?.id || booking.property_id}`)}
+                          onClick={() => navigate(`/properties/${booking.property?.id || booking.property_id}`)}
                           className="px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
                         >
                           View Property
