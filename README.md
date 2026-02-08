@@ -4,6 +4,7 @@
 
 **ShortStay** is a sophisticated, full-stack web application designed to streamline the short-term accommodation experience. Built with a focus on security, premium UI/UX, and robust role-based access control, it provides a seamless marketplace for both hosts and guests.
 
+![Hero image](hero.png)
 ---
 
 ## ✨ Key Features
